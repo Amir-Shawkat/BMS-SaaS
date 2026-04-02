@@ -620,7 +620,7 @@
     @apply flex gap-4;
   }
   .voice-selector-option {
-    @apply flex-1 flex items-center justify-center gap-3 p-4 border border-[var(--border-subtle)] rounded-lg cursor-pointer transition-all;
+    @apply grid grid-cols-[auto_1fr] items-center gap-2 p-4 border border-[var(--border-subtle)] rounded-lg cursor-pointer transition-all;
     box-shadow: var(--shadow-soft-sm);
 
     &:hover {
