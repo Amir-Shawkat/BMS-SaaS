@@ -533,7 +533,7 @@
     list-style: none;
   }
   .library-step-item {
-    @apply flex items-start gap-3;
+    @apply flex items-center justify-start gap-3;
     list-style: none;
   }
   .library-step-number {
