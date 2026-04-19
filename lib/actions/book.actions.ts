@@ -28,7 +28,8 @@ export const checkBookExists = async (title: string) => {
     } catch (e) {
         console.error('Error Checking book exists ', e);
         return {
-            exists: false, error: e
+            exists: false,
+            error: e instanceof Error ? e.message : 'Failed to check whether the book already exists',
         }
     }
 }
@@ -60,8 +61,8 @@ export const createBook = async ( data: CreateBook )=> {
         console.error('Error creating a book: ', e);
 
         return {
-            seccess: false,
-            error: e,
+            success: false,
+            error: e instanceof Error ? e.message : 'Failed to create book',
         }
     }
 }
@@ -73,7 +74,7 @@ export const saveBookSegments = async (bookId: string, ClerkId: string, segments
         console.log('Saving book segments...');
 
         const segmentsToInsert = segments.map(({ text, segmentIndex, pageNumber, wordCount}) => ({
-            clerkId, bookId, content: text, segmentIndex, pageNumber, wordCount
+            clerkId: ClerkId, bookId, content: text, segmentIndex, pageNumber, wordCount
         }));
 
         await BookSegment.insertMany(segmentsToInsert);
@@ -93,7 +94,7 @@ export const saveBookSegments = async (bookId: string, ClerkId: string, segments
         console.log('Deleted book segments and book due to failure to save segments.');
         return {
             success: false, 
-            error: e,
+            error: e instanceof Error ? e.message : 'Failed to save book segments',
         }
     }
 }

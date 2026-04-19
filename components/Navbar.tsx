@@ -63,8 +63,11 @@ const Navbar = () => {
                             </div>
                         ) : (
                             /* If the user is SIGNED OUT */
-                            <SignInButton mode="modal" className="text-black font-semibold hover:opacity-70" />
-
+                            <SignInButton mode="modal">
+                                <button type="button" className="text-black font-semibold hover:opacity-70">
+                                    Sign In
+                                </button>
+                            </SignInButton>
                         )}
                     </div>
                 </nav>
