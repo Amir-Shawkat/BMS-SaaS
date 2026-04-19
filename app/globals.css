@@ -462,7 +462,7 @@
     @apply bg-green-500 animate-pulse;
   }
   .vapi-status-text {
-    @apply text-sm font-medium text-[#212a3b];
+    @apply text-sm font-bold text-[#777777];
     font-family: 'IBM Plex Serif', serif;
   }
   .vapi-stat-box {

@@ -98,3 +98,48 @@ export const saveBookSegments = async (bookId: string, ClerkId: string, segments
         }
     }
 }
+
+export const getAllBooks = async () => {
+    try {
+        await connectToDatabase();
+
+        const books = await Book.find().sort({ createdAt: -1 }).lean();
+
+        return {
+            success: true,
+            data: serializeData(books),
+        }
+    } catch (e) {
+        console.error('Error connecting to database', e);
+        return {
+            success: false, error: e,
+        }
+    }
+}
+
+export const getBookBySlug = async (slug: string) => {
+    try {
+        await connectToDatabase();
+
+        const book = await Book.findOne({ slug }).lean();
+
+        if (!book) {
+            return {
+                success: false,
+                data: null,
+            };
+        }
+
+        return {
+            success: true,
+            data: serializeData(book),
+        };
+    } catch (e) {
+        console.error('Error fetching book by slug', e);
+        return {
+            success: false,
+            data: null,
+            error: e instanceof Error ? e.message : 'Failed to fetch book',
+        };
+    }
+}

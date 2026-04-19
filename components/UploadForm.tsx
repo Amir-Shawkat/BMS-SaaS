@@ -20,6 +20,12 @@ import {useRouter} from "next/navigation";
 import {parsePDFFile} from "@/lib/utils";
 import {upload} from "@vercel/blob/client";
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+    if (error instanceof Error && error.message) return error.message;
+    if (typeof error === 'string' && error) return error;
+    return fallback;
+};
+
 const UploadForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
@@ -53,6 +59,11 @@ const UploadForm = () => {
         try {
             const existsCheck = await checkBookExists(data.title);
 
+            if (existsCheck.error) {
+                toast.error(existsCheck.error);
+                return;
+            }
+
             if(existsCheck.exists && existsCheck.book) {
                 toast.info("Book with same title already exists.");
                 form.reset()
@@ -70,7 +81,7 @@ const UploadForm = () => {
                 return;
             }
 
-            const uploadedPdfBlob = await upload(fileTitle, pdfFile, {
+            const uploadedPdfBlob = await upload(`${fileTitle}.pdf`, pdfFile, {
                 access: 'public',
                 handleUploadUrl: '/api/upload',
                 contentType: 'application/pdf'
@@ -88,6 +99,11 @@ const UploadForm = () => {
                 coverUrl = uploadedCoverBlob.url;
             } else {
                 const response = await fetch(parsedPDF.cover)
+
+                if (!response.ok) {
+                    throw new Error('Failed to prepare the generated cover image for upload.');
+                }
+
                 const blob = await response.blob();
 
                 const uploadedCoverBlob = await upload(`${fileTitle}_cover.png`, blob, {
@@ -110,7 +126,7 @@ const UploadForm = () => {
             });
 
             if(!book.success) {
-                toast.error(book.error as string || "Failed to create book");
+                toast.error(book.error || "Failed to create book");
                 return;
             }
 
@@ -124,8 +140,8 @@ const UploadForm = () => {
             const segments = await saveBookSegments(book.data._id, userId, parsedPDF.content);
 
             if(!segments.success) {
-                toast.error("Failed to save book segments");
-                throw new Error("Failed to save book segments");
+                toast.error(segments.error || "Failed to save book segments");
+                throw new Error(segments.error || "Failed to save book segments");
             }
 
             form.reset();
@@ -133,7 +149,7 @@ const UploadForm = () => {
         } catch (error) {
             console.error(error);
 
-            toast.error("Failed to upload book. Please try again later.");
+            toast.error(getErrorMessage(error, "Failed to upload book. Please try again later."));
         } finally {
             setIsSubmitting(false);
         }
